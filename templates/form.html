@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Placement Drive Registration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @media (max-width: 768px) {
+    .form-container {
+        flex-direction: column !important;
+        align-items: stretch;
+        gap: 20px;
+    }
+
+    .left-section,
+    .right-section {
+        width: 100% !important;
+    }
+
+    .field {
+        flex-direction: column;
+    }
+
+    .field label {
+        margin-bottom: 5px;
+    }
+}
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .form-container {
+            background-color: #d9d9d9;
+            padding: 25px;
+            max-width: 850px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            height: 100px;
+        }
+        .form-title {
+            font-weight: bold;
+            font-size: 20px;
+            margin-top: 10px;
+        }
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 7px;
+            border: 1px solid #999;
+            border-radius: 5px;
+        }
+        .full-width {
+            grid-column: 1 / span 2;
+        }
+        .btn-row {
+            grid-column: 1 / span 2;
+            text-align: center;
+            margin-top: 10px;
+        }
+        button {
+            background-color: #3399ff;
+            border: none;
+            padding: 10px 30px;
+            color: white;
+            font-weight: bold;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #007acc;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="header">
+            <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+  <img src="/static/goalogo.jpeg" alt="Goa Govt Logo" style="height: 150px;" />
+</div>
+            <div class="form-title">Placement Drive / Session Registration Form</div>
+        </div>
+        <form method="post" autocomplete="off">
+            <label>FULL NAME</label>
+            <input type="text" name="fullname" required>
+
+            <label>GENDER</label>
+            <select name="gender" required>
+                <option value="">Select</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+            </select>
+
+            <label>ADDRESS</label>
+            <input type="text" name="address" required>
+
+            <label>CATEGORY</label>
+            <select name="category" required>
+                <option value="">Select</option>
+                <option>General</option>
+                <option>OBC</option>
+                <option>SC</option>
+                <option>ST</option>
+            </select>
+
+            <label>TALUKA</label>
+            <input type="text" name="taluka" required>
+
+            <label>STATE</label>
+            <input type="text" name="state" required>
+
+            <label>MOBILE NO.</label>
+            <input type="tel" name="mobile" maxlength="10" pattern="[0-9]{10}" maxlength="10" autocomplete="off" required>
+
+            <label>EXPERIENCE IN YEARS</label>
+            <input type="number" name="experience" required>
+
+            <label>EMAIL ID</label>
+            <input type="email" name="email" placeholder="Email" autocomplete="off" required>
+
+            <label>EMPLOYMENT STATUS</label>
+            <select name="employment" required>
+                <option value="">Select</option>
+                <option>Employed</option>
+                <option>Unemployed</option>
+            </select>
+
+            <label>HIGHEST QUALIFICATION</label>
+            <input type="text" name="qualification" required>
+
+            <label>REGISTERED FOR EMPLOYMENT CARD</label>
+            <select name="employment_card" required>
+                <option value="">Select</option>
+                <option>Yes</option>
+                <option>No</option>
+            </select>
+
+            <div class="btn-row">
+                <button type="submit">Submit</button>
+                <button type="reset">Clear</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
