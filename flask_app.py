@@ -2,12 +2,15 @@ from flask import Flask, render_template, request, redirect
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
+import os
+import json
 
 app = Flask(__name__)
 
 # Google Sheets setup
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name('registration-466210-4946687b0717.json', scope)
+creds_dict = json.loads(os.environ['GOOGLE_CREDS'])
+creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 sheet = client.open("My_Form_Responses").sheet1
 
