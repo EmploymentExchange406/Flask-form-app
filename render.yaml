@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: employment-form
+    env: python
+    buildCommand: ""
+    startCommand: "gunicorn app:app"
+    plan: free
+    region: oregon
+    branch: main
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: "10000"  # Optional: Render auto-assigns this if not set
