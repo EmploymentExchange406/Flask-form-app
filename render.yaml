@@ -3,7 +3,7 @@ services:
     name: employment-form
     env: python
     buildCommand: ""
-    startCommand: "gunicorn app:app"
+    startCommand: "gunicorn flask_app:app"
     plan: free
     region: oregon
     branch: main
