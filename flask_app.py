@@ -51,10 +51,5 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True)
-from flask import Flask, render_template, request, redirect
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-from datetime import datetime
-
 app = Flask(__name__)
 
