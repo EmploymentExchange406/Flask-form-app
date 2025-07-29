@@ -14,7 +14,7 @@ creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 sheet = client.open("My_Form_Responses").sheet1
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route("/", methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         fullname = request.form.get('fullname', '')
@@ -50,6 +50,6 @@ def index():
     return render_template('form.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
 app = Flask(__name__)
 
