@@ -7,6 +7,7 @@ import json
 
 app = Flask(__name__)
 
+
 # Google Sheets setup
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds_dict = json.loads(os.environ['GOOGLE_CREDS'])
@@ -50,6 +51,6 @@ def index():
     return render_template('form.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-app = Flask(__name__)
+  app.run(host='0.0.0.0', port=5000)
+
 
