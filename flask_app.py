@@ -9,6 +9,7 @@ import base64
 app = Flask(__name__)
 
 # Google Sheets setup
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
 creds_dict = json.loads(creds_json)
 creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
