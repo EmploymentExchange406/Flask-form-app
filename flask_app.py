@@ -4,16 +4,16 @@ from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 import os
 import json
+import base64
 
 app = Flask(__name__)
 
-
 # Google Sheets setup
-scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-creds_dict = json.loads(os.environ['GOOGLE_CREDS'])
+creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
+creds_dict = json.loads(creds_json)
 creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
-sheet = client.open("My_Form_Responses").sheet1
+sheet = client.open("Placement_Form_Responses").sheet1
 
 @app.route("/", methods=['GET', 'POST'])
 def index():

@@ -1,8 +1,9 @@
-import json
+import base64
 
-with open("registration-466210-4946687b0717.json", "r") as f:
-    data = json.load(f)
+with open("flaskformdataproject-38167ba1ba59.json", "rb") as f:
+    encoded = base64.b64encode(f.read()).decode("utf-8")
 
-with open(".env", "w") as f:
-    escaped = json.dumps(data)
-    f.write(f"GOOGLE_CREDS={escaped}")
+with open("encoded.txt", "w") as f:
+    f.write(encoded)
+
+print("✅ Encoded JSON saved to 'encoded.txt'")
