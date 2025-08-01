@@ -104,14 +104,14 @@
                 <option value="">Select</option>
                 <option>Male</option>
                 <option>Female</option>
-                <option>Other</option>
+                <option>Transgender</option>
             </select>
 
             <label>ADDRESS</label>
             <input type="text" name="address" required>
 
             <label>CATEGORY</label>
-            <select name="category" required>
+            <select name="category" id="category" required oninvalid="this.setCustomValidity('Please select a category')" oninput="this.setCustomValidity('')">
                 <option value="">Select</option>
                 <option>General</option>
                 <option>OBC</option>
@@ -120,16 +120,36 @@
             </select>
 
             <label>TALUKA</label>
-            <input type="text" name="taluka" required>
+            <select name="taluka" required>
+                <option value="">Select</option>
+                <option>Bardez</option>
+                <option>Bicholim</option>
+                <option>Canacona</option>
+                <option>Dharbandora</option>
+                <option>Mormugoa</option>
+                <option>Pernem</option>
+                <option>Ponda</option>
+                <option>Quepem</option>
+                <option>Salcete</option>
+                <option>Sanguem</option>
+                <option>Sattari</option>
+                <option>Tiswadi</option>
+            </select>
 
             <label>STATE</label>
-            <input type="text" name="state" required>
+            <select name="state" required>
+                <option value="">Select</option>
+                <option>Goa</option>
+            </select>
 
             <label>MOBILE NO.</label>
-            <input type="tel" name="mobile" maxlength="10" pattern="[0-9]{10}" maxlength="10" autocomplete="off" required>
+            <input type="text" name="mobile" maxlength="10" 
+            pattern="[0-9]{10}" maxlength="10" 
+            autocomplete="off" 
+            oninvalid="this.setCustomValidity('Enter valid mobile number')"oninput="this.setCustomValidity('')"required>
 
             <label>EXPERIENCE IN YEARS</label>
-            <input type="number" name="experience" required>
+            <input type="number" name="experience" step="0.1" required>
 
             <label>EMAIL ID</label>
             <input type="email" name="email" placeholder="Email" autocomplete="off" required>
@@ -144,18 +164,49 @@
             <label>HIGHEST QUALIFICATION</label>
             <input type="text" name="qualification" required>
 
+
+
+
             <label>REGISTERED FOR EMPLOYMENT CARD</label>
-            <select name="employment_card" required>
+             <select id="employmentCard" name="employmentCard" onchange="toggleCardNumberField()" required>
                 <option value="">Select</option>
                 <option>Yes</option>
                 <option>No</option>
             </select>
+              <label id="employmentCardLabel" style="display: none;">EMPLOYMENT CARD NUMBER</label>
+              <input type="text" id="employmentCardNumber" name="employmentCardNumber" style="display: none;">
+              </div>
+
 
             <div class="btn-row">
-                <button type="submit">Submit</button>
-                <button type="reset">Clear</button>
+                <button type="submit" style="width: 120px; height: 40px;">SUBMIT</button>
+                <button type="reset" style="width: 120px; height: 40px;">CLEAR</button>
             </div>
         </form>
-    </div>
+        <script>
+
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === 'true') {
+            alert("✅ Submission Successful!");
+        }
+    }
+</script>
+   <script>
+function toggleCardNumberField() {
+    const select = document.getElementById("employmentCard");
+    const label = document.getElementById("employmentCardLabel");
+    const input = document.getElementById("employmentCardNumber");
+
+    if (select.value === "Yes") {
+        label.style.display = "block";
+        input.style.display = "block";
+    } else {
+        label.style.display = "none";
+        input.style.display = "none";
+    }
+}
+</script>
 </body>
 </html>
+

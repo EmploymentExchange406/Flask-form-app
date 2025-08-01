@@ -10,9 +10,10 @@ app = Flask(__name__)
 
 # Google Sheets setup
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
-creds_dict = json.loads(creds_json)
-creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name("flaskformdataproject-38167ba1ba59.json", scope)
+#creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
+#creds_dict = json.loads(creds_json)
+#creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 sheet = client.open("Placement_Form_Responses").sheet1
 
@@ -30,13 +31,15 @@ def index():
         category = request.form.get('category', '')
         experience = request.form.get('experience', '')
         employment = request.form.get('employment', '')
-        employment_card = request.form.get('employment_card', '')
+        employmentCard = request.form.get('employmentCard', '')
+        employmentCardNumber = request.form.get('employmentCardNumber','')
 
         # VALIDATIONS
         if not (mobile.isdigit() and len(mobile) == 10):
             return "Error: Mobile number must be exactly 10 digits."
-        if not experience.isdigit():
-            return "Error: Experience must be a number."
+        try : experience = float(experience)
+        except ValueError:
+         return "Error: Experience must be a number."
 
         # Date and time
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -45,11 +48,11 @@ def index():
         sheet.append_row([
             fullname, address, taluka, state, email, mobile,
             qualification, gender, category, experience,
-            employment, employment_card, timestamp
+            employment, employmentCard, employmentCardNumber, timestamp
         ])
-        return redirect('/')
+        return redirect('/?success=true')
 
-    return render_template('form.html')
+    return render_template('form.html',success=True)
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=5000)
