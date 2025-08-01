@@ -43,7 +43,8 @@
             margin-bottom: 20px;
         }
         .header img {
-            height: 100px;
+            max-width: 100%;
+            height: auto;
         }
         .form-title {
             font-weight: bold;
@@ -90,8 +91,8 @@
 <body>
     <div class="form-container">
         <div class="header">
-            <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-  <img src="/static/goalogo.jpeg" alt="Goa Govt Logo" style="height: 150px;" />
+          <div class="header">
+  <img src="/static/goalogo.jpeg" alt="Goa Govt Logo">
 </div>
             <div class="form-title">Placement Drive / Session Registration Form</div>
         </div>
@@ -184,7 +185,6 @@
             </div>
         </form>
         <script>
-
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('success') === 'true') {
