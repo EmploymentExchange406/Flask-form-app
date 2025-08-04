@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
+import pytz
 import os
 import json
 import base64
@@ -42,6 +43,7 @@ def index():
          return "Error: Experience must be a number."
 
         # Date and time
+        ist = pytz.timezone('Asia/Kolkata')
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
          
         # Add to Google Sheet
