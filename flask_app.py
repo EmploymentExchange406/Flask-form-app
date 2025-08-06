@@ -6,7 +6,6 @@ import pytz
 import os
 import json
 import base64
-#from flask_mail import Mail, Message
 
 
 app = Flask(__name__)
