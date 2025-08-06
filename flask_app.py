@@ -6,6 +6,8 @@ import pytz
 import os
 import json
 import base64
+#from flask_mail import Mail, Message
+
 
 app = Flask(__name__)
 
@@ -58,5 +60,3 @@ def index():
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=5000)
-
-
