@@ -73,19 +73,42 @@
             text-align: center;
             margin-top: 10px;
         }
-        button {
-            background-color: #3399ff;
-            border: none;
-            padding: 10px 30px;
-            color: white;
-            font-weight: bold;
-            margin: 5px;
-            border-radius: 5px;
-            cursor: pointer;
+            .submit-btn {
+                background-color: #4CAF50;
+                padding: 10px 30px;
+                color: white;
+                border: none;
+                border-radius: 10px;
         }
-        button:hover {
-            background-color: #007acc;
+            
+            .submit-btn:hover {
+                background-color: #45a049;
         }
+        
+            .clear-btn {
+                background-color: #f44336;
+                padding: 10px 30px;
+                color: white;
+                border: none;
+                border-radius: 10px;
+        }
+            
+            .clear-btn:hover {
+                background-color: #da190b;
+        }
+            
+            .admin-btn {
+                background-color: #008CBA;
+                padding: 10px 30px;
+                color: white;
+                border: none;
+                border-radius: 10px;
+        }
+            
+            .admin-btn:hover {
+                background-color: #005f73;
+        }
+            
                 label::after {
              content: " :";
              color: black;
@@ -180,14 +203,24 @@
                 <option>Yes</option>
                 <option>No</option>
             </select>
-              <label id="employmentCardLabel" style="display: none;">EMPLOYMENT CARD NUMBER (OPTIONAL)</label>
+              <label id="employmentCardLabel" style="display: none;">EMPLOYMENT CARD NUMBER</label>
               <input type="text" id="employmentCardNumber" pattern="LBR/LE/\d{4}/\d{3,}" placeholder="eg.LBR/LE/****/********" name="employmentCardNumber" style="display: none;">
               </div>
-
-
             <div class="btn-row">
-                <button type="submit" style="width: 120px; height: 40px;">SUBMIT</button>
-                <button type="reset" style="width: 120px; height: 40px;">CLEAR</button>
+                <button type="submit" class="submit-btn" style="width: 120px; height: 40px;">SUBMIT</button>
+                <button type="reset" class="clear-btn" style="width: 120px; height: 40px;">CLEAR</button>
+                <button type="button" class="admin-btn" style="width: 120px; height: 40px;" onclick="openAdminWindow()">ADMIN</button>
+
+                  <!-- Script to handle window popup -->
+                  <script>
+                    function openAdminWindow() {
+                      window.open(
+                        "{{ url_for('admin') }}",
+                        "AdminPanel",
+                        "width=600,height=500,resizable=yes,scrollbars=yes"
+                      );
+                    }
+                  </script>
             </div>
         </form>
         <script>

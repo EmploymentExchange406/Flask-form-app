@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+</head>
+<body>
+    <h2>Update Event Name</h2>
+    <form method="POST">
+        <label for="event_name">Current Event Name:</label><br>
+        <input type="text" name="event_name" font-weight="bold" value="{{ event_name }}" required><br><br>
+
+        <label for="event_date">Event Date:</label><br>
+        <input type="date" name="event_date" font-weight="bold" value="{{ event_date }}" required><br><br>
+
+        <label for="event_time">Event Time:</label><br>
+        <input type="text" name="event_time" font-weight="bold" value="{{ current_time }}"required><br><br>
+
+        <label for="venue">Venue:</label><br>
+        <input type="text" name="venue" font-weight= bold value="{{ event_venue }}" required><br><br>
+
+                                                            
+        <button type="submit">Update Event</button>
+    </form>
+    <br>
+    <a href="/logout">Logout</a>
+</body>
+</html>
