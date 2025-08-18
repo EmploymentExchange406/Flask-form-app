@@ -113,8 +113,27 @@
              content: " :";
              color: black;
              font-weight: bold;
-}
-
+        }
+       #successPopup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0,0,0,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        }
+        
+        .popup-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -221,16 +240,27 @@
                       );
                     }
                   </script>
-            </div>
+            <div id="successPopup" style="display: none;">
+                <div class="popup-content">
+                    <img src="{{ url_for('static', filename='Done.gif') }}" alt="Success" width="150">
+                    <p style="font-weight: bold; font-size: 24px;">Submission Successful !</p>
+                </div>
+             </div>
         </form>
-        <script>
+<script>
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('success') === 'true') {
-            alert("✅ Submission Successful!");
+            document.getElementById('successPopup').style.display = 'flex';
+
+            // Optional: Hide after 3 seconds
+            setTimeout(() => {
+                document.getElementById('successPopup').style.display = 'none';
+            }, 3000);
         }
     }
 </script>
+
    <script>
 function toggleCardNumberField() {
     const select = document.getElementById("employmentCard");
@@ -245,6 +275,17 @@ function toggleCardNumberField() {
         input.style.display = "none";
     }
 }
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+        const submitButton = document.querySelector(".submit-btn");
+
+        form.addEventListener("submit", function () {
+            submitButton.disabled = true; // Prevent double-click
+            submitButton.innerText = "Submitting..."; // Optional visual feedback
+        });
+    });
 </script>
 </body>
 </html>

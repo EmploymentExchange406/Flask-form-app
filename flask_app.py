@@ -144,6 +144,7 @@ def index():
         
         
         Thank you for taking this step. We look forward to seeing you!
+
         Regards, 
         Regional Employment Exchange, 
         Model Career Centre,
