@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Report Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #f1f1f1, #ffffff);
+            text-align: center;
+            padding: 30px;
+        }
+
+        form {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        select, input[type="date"] {
+            padding: 5px;
+            margin: 10px;
+        }
+
+        .report {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Generate Summary Report</h2>
+
+    <form method="POST">
+        <label>Select Date:</label><br>
+        <input type="date" name="report_date" required><br><br>
+
+        <label>Select Taluka:</label><br>
+        <select name="report_taluka">
+            <option value="All">All Talukas</option>
+            {% for taluka in talukas %}
+                <option value="{{ taluka }}">{{ taluka }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <button type="submit">Generate Report</button>
+    </form>
+
+    {% if report %}
+    <div class="report">
+        <div class="section">
+            <strong>Total Registrations on {{ report.date }}{% if report.taluka != 'All' %} in {{ report.taluka }}{% endif %}:</strong><br>
+            Total: {{ report.total }}
+        </div>
+
+        <div class="section">
+            <strong>Employment Status:</strong><br>
+            EMPLOYED: {{ report.employed }}<br>
+            UNEMPLOYED: {{ report.unemployed }}
+        </div>
+
+        <div class="section">
+            <strong>Gender Counts:</strong><br>
+            Male: {{ report.male }}<br>
+            Female: {{ report.female }}<br>
+            Transgender: {{ report.transgender }}
+        </div>
+
+        <div class="section">
+            <strong>Category Counts:</strong><br>
+            {% for caste, count in report.caste_counts.items() %}
+                {{ caste }}: {{ count }}<br>
+            {% endfor %}
+        </div>
+
+        <div class="section">
+            <strong>Registered for Employment Card:</strong><br>
+            Yes: {{ report.emp_card_yes }}<br>
+            No: {{ report.emp_card_no }}
+        </div>
+    </div>
+    {% endif %}
+  <script>
+    let inactivityTime = function () {
+        let timer;
+
+        function logout() {
+            alert("You have been logged out due to inactivity.");
+            window.location.href = "/logout";  // your logout route
+        }
+
+        function resetTimer() {
+            clearTimeout(timer);
+            timer = setTimeout(logout, 60000); // 1 minute = 60000 ms
+        }
+
+        // Listen for user activity
+        window.onload = resetTimer;
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+        document.onscroll = resetTimer;
+        document.onclick = resetTimer;
+    };
+
+    inactivityTime();
+
+  // Log out when user closes the tab/window
+        window.addEventListener('beforeunload', function (e) {
+            // Make a fetch request to logout on close
+            navigator.sendBeacon('/logout');  // Use sendBeacon to avoid blocking the unload
+        });
+</script>
+</body>
+</html>

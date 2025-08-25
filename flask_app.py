@@ -7,11 +7,14 @@ import pytz
 import os
 import json
 import base64
+import pandas as pd
 from functools import wraps
 from flask import session
+from datetime import timedelta
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_admin_key_0987654321'
+app.permanent_session_lifetime = timedelta(minutes=1)
 
 def get_event_name():
     try:
@@ -66,6 +69,12 @@ creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 sheet = client.open("Placement_Form_Responses").sheet1
 event_meta_sheet = client.open("Placement_Form_Responses").worksheet("Sheet2")
+
+
+def load_sheet_data():
+    data = sheet.get_all_records()
+    df = pd.DataFrame(data)
+    return df
 
 # Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -173,12 +182,28 @@ def admin():
         if request.method == 'POST':
             password = request.form['password']
             if password == 'admin123':
+                session.permanent = True
                 session['logged_in'] = True
+                return redirect(url_for('admin_panel'))
             else:
                 return "Incorrect password"
 
         if 'logged_in' not in session:
             return render_template('admin_login.html')
+        
+    return redirect(url_for('admin_panel'))
+
+@app.route('/admin-panel')
+def admin_panel():
+    if 'logged_in' not in session:
+        return redirect(url_for('admin'))
+
+    return render_template('admin_panel.html')
+
+@app.route('/admin-settings', methods=['GET', 'POST'])
+def admin_settings():
+    if 'logged_in' not in session:
+        return redirect(url_for('admin'))
 
     current_event = get_event_name()
     current_date = get_event_date()
@@ -207,8 +232,54 @@ def admin():
 
     return render_template('admin.html', event_name=current_event,event_date=current_date,time=current_time,venue=current_venue)
 
+@app.route('/generate-report', methods=['GET', 'POST'])
+def generate_report():
+    df = load_sheet_data()  # Replace with your actual Google Sheet loading function
+
+    # Clean and prepare data
+    df['DATE & TIME'] = pd.to_datetime(df['DATE & TIME'])
+    df['Date'] = df['DATE & TIME'].dt.date
+    df['Taluka'] = df['TALUKA'].str.strip()
+    df['Gender'] = df['GENDER'].str.lower()
+    df['Employment Status'] = df['EMPLOYMENT STATUS'].str.upper()
+    df['Category'] = df['CATEGORY'].str.upper()
+    df['Registered for Employment Card'] = df['REGISTERED FOR EMPLOYMENT CARD'].str.lower()
+
+    # Unique talukas for dropdown
+    talukas_raw = df['TALUKA'].dropna().unique()
+    talukas_cleaned = sorted([t.strip() for t in talukas_raw if t.strip() != ""])
+
+    report = None
+
+    if request.method == 'POST':
+        date = request.form['report_date']
+        taluka = request.form['report_taluka']
+
+        date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+
+        # Filter data
+        df_filtered = df[df['Date'] == date_obj]
+        if taluka != 'All':
+             df_filtered = df_filtered[df_filtered['TALUKA'].str.strip().str.lower() == taluka.strip().lower()]
+
+        # Prepare counts
+        report = {
+            'date': date,
+            'taluka': taluka,
+            'total': len(df_filtered),
+            'employed': len(df_filtered[df_filtered['Employment Status'] == 'EMPLOYED']),
+            'unemployed': len(df_filtered[df_filtered['Employment Status'] == 'UNEMPLOYED']),
+            'male': len(df_filtered[df_filtered['Gender'] == 'male']),
+            'female': len(df_filtered[df_filtered['Gender'] == 'female']),
+            'transgender': len(df_filtered[df_filtered['Gender'] == 'transgender']),
+            'caste_counts': df_filtered['Category'].value_counts().to_dict(),
+            'emp_card_yes': len(df_filtered[df_filtered['Registered for Employment Card'] == 'yes']),
+            'emp_card_no': len(df_filtered[df_filtered['Registered for Employment Card'] == 'no']),
+        }
+
+    return render_template('generate_report.html', talukas=talukas_cleaned, report=report)
 # --- Logout Admin ---
-@app.route('/logout')
+@app.route('/logout',methods=['GET', 'POST'])
 def logout():
     session.pop('logged_in', None)
     return redirect (url_for('admin'))
