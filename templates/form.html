@@ -32,11 +32,13 @@
         }
         .form-container {
             background-color: #d9d9d9;
+            backdrop-filter: blur(10px);   
+            -webkit-backdrop-filter: blur(10px); 
             padding: 25px;
             max-width: 850px;
             margin: auto;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
         .header {
             text-align: center;
@@ -45,6 +47,8 @@
         .header img {
             max-width: 100%;
             height: auto;
+            border-radius: 12px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
         .form-title {
             font-weight: bold;
@@ -64,6 +68,7 @@
             padding: 7px;
             border: 1px solid #999;
             border-radius: 5px;
+             box-sizing: border-box;
         }
         .full-width {
             grid-column: 1 / span 2;

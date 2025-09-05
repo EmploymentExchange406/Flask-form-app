@@ -2,57 +2,53 @@
 <html>
 <head>
     <title>Admin Panel</title>
+    <style>
+        input {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+            margin: 10px 0;
+            transition: opacity 0.5s ease;
+        }
+    </style>
 </head>
 <body>
-    <h2>Update Event Name</h2>
-    <form method="POST">
+    <h2>Update Event Details</h2>
+
+       {% if message %}
+        <div class="success" id="successMessage">{{ message }}</div>
+        <script>
+            // Auto-hide after 5 seconds
+            setTimeout(function() {
+                var msg = document.getElementById("successMessage");
+                if (msg) {
+                    msg.style.opacity = "0"; // fade out
+                    setTimeout(() => msg.remove(), 500); // remove from DOM after fade
+                }
+            }, 5000);
+        </script>
+    {% endif %}
+
+    <form method="POST"  action="{{ url_for('set_event') }}">
         <label for="event_name">Current Event Name:</label><br>
-        <input type="text" name="event_name" font-weight="bold" value="{{ event_name }}" required><br><br>
+        <input type="text" name="event_name" value="{{ event_name }}" required><br><br>
 
         <label for="event_date">Event Date:</label><br>
-        <input type="date" name="event_date" font-weight="bold" value="{{ event_date }}" required><br><br>
+        <input type="date" name="event_date" value="{{ event_date }}" required><br><br>
 
         <label for="event_time">Event Time:</label><br>
-        <input type="text" name="event_time" font-weight="bold" value="{{ current_time }}"required><br><br>
+        <input type="text" name="event_time" value="{{ time }}" required><br><br>
 
         <label for="venue">Venue:</label><br>
-        <input type="text" name="venue" font-weight="bold" value="{{ event_venue }}" required><br><br>
+        <input type="text" name="venue" value="{{ venue }}" required><br><br>
 
-                                                            
-        <button type="submit">Update Event</button>
+        <button type="submit">Update Event</button> 
     </form>
     <br>
     <a href="/logout">Logout</a>
-    <script>
-    let inactivityTime = function () {
-        let timer;
-
-        function logout() {
-            alert("You have been logged out due to inactivity.");
-            window.location.href = "/logout";  // your logout route
-        }
-
-        function resetTimer() {
-            clearTimeout(timer);
-            timer = setTimeout(logout, 60000); // 1 minute = 60000 ms
-        }
-
-        // Listen for user activity
-        window.onload = resetTimer;
-        document.onmousemove = resetTimer;
-        document.onkeypress = resetTimer;
-        document.onscroll = resetTimer;
-        document.onclick = resetTimer;
-    };
-
-    inactivityTime();
-
-  // Log out when user closes the tab/window
-        window.addEventListener('beforeunload', function (e) {
-            // Make a fetch request to logout on close
-            navigator.sendBeacon('/logout');  // Use sendBeacon to avoid blocking the unload
-        });
-</script>
-
+    </script>
 </body>
 </html>

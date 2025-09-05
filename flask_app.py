@@ -200,37 +200,47 @@ def admin_panel():
 
     return render_template('admin_panel.html')
 
-@app.route('/admin-settings', methods=['GET', 'POST'])
-def admin_settings():
+@app.route('/set_event', methods=['GET', 'POST'])
+def set_event():
     if 'logged_in' not in session:
-        return redirect(url_for('admin'))
+        return redirect(url_for('admin'))  # redirect to login if not logged in
 
+    # Load current event details
     current_event = get_event_name()
     current_date = get_event_date()
     current_time = get_event_time()
     current_venue = get_event_venue()
+    message = None
 
-    if request.method == 'POST' and 'event_name' in request.form:
-        new_event = request.form['event_name']
-        set_event_name(new_event)
-        current_event = new_event
+    if request.method == "POST":
+        # Read form inputs
+        event_name = request.form.get("event_name")
+        event_date = request.form.get("event_date")
+        event_time = request.form.get("event_time")
+        venue = request.form.get("venue")
 
-    if 'event_date' in request.form:
-            new_date = request.form['event_date']
-            set_event_date(new_date)
-            current_date = new_date
+        # Update files if inputs exist
+        if event_name:
+            set_event_name(event_name)
+            current_event = event_name
+        if event_date:
+            set_event_date(event_date)
+            current_date = event_date
+        if event_time:
+            set_event_time(event_time)
+            current_time = event_time
+        if venue:
+            set_event_venue(venue)
+            current_venue = venue
 
-    if 'event_time' in request.form:
-           new_time = request.form['event_time']
-           set_event_time(new_time)
-           current_time = new_time        
+        message = "✅ Event details updated successfully!"
 
-    if 'venue' in request.form:
-           new_venue = request.form['venue']
-           set_event_venue(new_venue)
-           current_venue = new_venue
-
-    return render_template('admin.html', event_name=current_event,event_date=current_date,time=current_time,venue=current_venue)
+    return render_template("admin.html",
+                           event_name=current_event,
+                           event_date=current_date,
+                           event_time=current_time,
+                           venue=current_venue,
+                           message=message)
 
 @app.route('/generate-report', methods=['GET', 'POST'])
 def generate_report():
