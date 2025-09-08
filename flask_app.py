@@ -17,48 +17,19 @@ app.secret_key = 'super_secret_admin_key_0987654321'
 app.permanent_session_lifetime = timedelta(minutes=1)
 
 def get_event_name():
-    try:
-        with open('event_name.txt', 'r') as f:
-            return f.read().strip()
-    except FileNotFoundError:
-        return "Default Event"
+    return event_meta_sheet.acell('A2').value or "Your Event"
 
-def set_event_name(event_name):
-    with open('event_name.txt', 'w') as f:
-        f.write(event_name)
-        
 def get_event_date():
-    try:
-        with open("event_date.txt", "r") as f:
-            return f.read().strip()
-    except FileNotFoundError:
-        return ""
-
-def set_event_date(date):
-    with open("event_date.txt", "w") as f:
-        f.write(date)
+    return event_meta_sheet.acell('B2').value or "Event Date"
 
 def get_event_time():
-    try:
-        with open("event_time.txt", "r") as f:
-            return f.read().strip()
-    except FileNotFoundError:
-        return ""
-
-def set_event_time(time):
-    with open("event_time.txt", "w") as f:
-        f.write(time)        
+    return event_meta_sheet.acell('C2').value or "Event Time"
 
 def get_event_venue():
-    try:
-        with open("venue.txt", "r") as f:
-            return f.read().strip()
-    except FileNotFoundError:
-        return ""
+    return event_meta_sheet.acell('D2').value or "Venue"
 
-def set_event_venue(venue):
-    with open("venue.txt", "w") as f:
-        f.write(venue)
+def set_event_details(name, date, time, venue):
+    event_meta_sheet.update('A2:D2', [[name, date, time, venue]])
 
 # Google Sheets setup
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -68,7 +39,7 @@ creds_dict = json.loads(creds_json)
 creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 sheet = client.open("Placement_Form_Responses").sheet1
-event_meta_sheet = client.open("Placement_Form_Responses").worksheet("Sheet2")
+event_meta_sheet = client.open("Placement_Form_Responses").worksheet("Event_Details")
 
 
 def load_sheet_data():
@@ -126,17 +97,14 @@ def index():
         fullname = last_entry["FULL NAME"]
         email = last_entry["EMAIL ID"]
         registration_id = len(all_data)  # Serial number
+
+
+        # Read event details from Google Sheet (Event_Details worksheet)
+        event_name = get_event_name()
         event_date = get_event_date()
-        time = get_event_time()
-        venue = get_event_venue()
-        
-        # Read event name from text file
-        try:
-            with open("event_name.txt", "r") as f:
-                event_name = f.read().strip()
-        except:
-            event_name = "Your Event"  # Fallback in case file not found   
-        
+        event_time = get_event_time()
+        event_venue = get_event_venue()
+
         # Compose the email
         message_body = f"""Dear {fullname},
         
@@ -148,8 +116,8 @@ def index():
         • Name: {fullname}
         • Registration ID: {registration_id}
         • Date of Event: {event_date}
-        • Time: {time}
-        • Venue: {venue}
+        • Time: {event_time}
+        • Venue: {event_venue}
         
         
         Thank you for taking this step. We look forward to seeing you!
@@ -203,44 +171,42 @@ def admin_panel():
 @app.route('/set_event', methods=['GET', 'POST'])
 def set_event():
     if 'logged_in' not in session:
-        return redirect(url_for('admin'))  # redirect to login if not logged in
+        return redirect(url_for('admin'))
 
-    # Load current event details
-    current_event = get_event_name()
-    current_date = get_event_date()
-    current_time = get_event_time()
-    current_venue = get_event_venue()
+    # Load current event details from Google Sheet
+    current_event_row = event_meta_sheet.row_values(2)
+    current_event = current_event_row[0] if len(current_event_row) > 0 else ''
+    current_date = current_event_row[1] if len(current_event_row) > 1 else ''
+    current_time = current_event_row[2] if len(current_event_row) > 2 else ''
+    current_venue = current_event_row[3] if len(current_event_row) > 3 else ''
     message = None
 
     if request.method == "POST":
-        # Read form inputs
-        event_name = request.form.get("event_name")
-        event_date = request.form.get("event_date")
-        event_time = request.form.get("event_time")
-        venue = request.form.get("venue")
+        new_event_name = request.form.get("event_name")
+        new_event_date = request.form.get("event_date")
+        new_event_time = request.form.get("event_time")
+        new_event_venue = request.form.get("venue")
 
-        # Update files if inputs exist
-        if event_name:
-            set_event_name(event_name)
-            current_event = event_name
-        if event_date:
-            set_event_date(event_date)
-            current_date = event_date
-        if event_time:
-            set_event_time(event_time)
-            current_time = event_time
-        if venue:
-            set_event_venue(venue)
-            current_venue = venue
+        # Save to Google Sheet
+        set_event_details(new_event_name, new_event_date, new_event_time, new_event_venue)
+
+        # Update variables for display
+        current_event = new_event_name
+        current_date = new_event_date
+        current_time = new_event_time
+        current_venue = new_event_venue
 
         message = "✅ Event details updated successfully!"
 
     return render_template("admin.html",
-                           event_name=current_event,
-                           event_date=current_date,
-                           event_time=current_time,
-                           venue=current_venue,
-                           message=message)
+        event_name=current_event,
+        event_date=current_date,
+        event_time=current_time,
+        venue=current_venue,
+        message=message
+    )
+
+
 
 @app.route('/generate-report', methods=['GET', 'POST'])
 def generate_report():
