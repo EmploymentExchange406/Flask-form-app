@@ -122,8 +122,8 @@ def index():
         📌 Registration Details:
         • Name: {fullname}
         • Registration ID: {registration_id}
-        • Date of Event: {event_date}
-        • Time: {event_time}
+        • Date of Registration: {event_date}
+        • Event Time: {event_time}
         • Venue: {event_venue}
         
         📌 Session Selected: {session_selected}
