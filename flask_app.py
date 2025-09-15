@@ -33,10 +33,10 @@ def set_event_details(name, date, time, venue):
 
 # Google Sheets setup
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-#creds = ServiceAccountCredentials.from_json_keyfile_name("flaskformdataproject-38167ba1ba59.json", scope)
-creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
-creds_dict = json.loads(creds_json)
-creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name("flaskformdataproject-38167ba1ba59.json", scope)
+#creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
+#creds_dict = json.loads(creds_json)
+#creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 sheet = client.open("Placement_Form_Responses").sheet1
 event_meta_sheet = client.open("Placement_Form_Responses").worksheet("Event_Details")
@@ -73,6 +73,13 @@ def index():
         employment = request.form.get('employment', '')
         employmentCard = request.form.get('employmentCard', '')
         employmentCardNumber = request.form.get('employmentCardNumber','')
+        session_selected = request.form.get('session', 'Session 1')
+
+        if session_selected == "Session 1":
+         session_details = "22/09/2025 & 23/09/2025"
+        else:
+         session_details = "24/09/2025 & 25/09/2025"
+
 
         # VALIDATIONS
         if not (mobile.isdigit() and len(mobile) == 10):
@@ -89,7 +96,7 @@ def index():
         sheet.append_row([
             fullname, address, taluka, state, email, mobile,
             qualification, gender, category, experience,
-            employment, employmentCard, employmentCardNumber, timestamp
+            employment, employmentCard, employmentCardNumber, timestamp, session_selected
         ])
         all_data = sheet.get_all_records()
         last_entry = all_data[-1]
@@ -115,10 +122,12 @@ def index():
         📌 Registration Details:
         • Name: {fullname}
         • Registration ID: {registration_id}
-        • Date of Event: {event_date}
+        • Date of Registration: {event_date}
         • Time: {event_time}
         • Venue: {event_venue}
         
+        📌 Session Selected: {session_selected}
+        📌 Session Details:  {session_details}
         
         Thank you for taking this step. We look forward to seeing you!
 
