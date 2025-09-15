@@ -109,7 +109,8 @@ def index():
 
         # Read event details from Google Sheet (Event_Details worksheet)
         event_name = get_event_name()
-        event_date = get_event_date()
+        ist = pytz.timezone('Asia/Kolkata')
+        event_date = datetime.now(ist).strftime("%Y-%m-%d")
         event_time = get_event_time()
         event_venue = get_event_venue()
 
@@ -129,6 +130,8 @@ def index():
         
         📌 Session Selected: {session_selected}
         📌 Session Details: {session_details}
+
+        Please note: Lunch and refreshments will be provided to all participants.
         
         Thank you for taking this step. We look forward to seeing you!
 
