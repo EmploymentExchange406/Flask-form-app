@@ -14,7 +14,7 @@ from datetime import timedelta
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_admin_key_0987654321'
-app.permanent_session_lifetime = timedelta(minutes=1)
+app.permanent_session_lifetime = timedelta(minutes=30)
 
 def get_event_name():
     return event_meta_sheet.acell('A2').value or "Your Event"
