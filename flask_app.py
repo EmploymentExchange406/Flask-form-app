@@ -29,7 +29,11 @@ def get_event_venue():
     return event_meta_sheet.acell('D2').value or "Venue"
 
 def set_event_details(name, date, time, venue):
-    event_meta_sheet.update('A2:D2', [[name, date, time, venue]])
+    try:
+       event_meta_sheet.update('A2:D2', [[name, date, time, venue]])
+    except Exception as e:
+       print(f"[ERROR] Failed to update event details in Google Sheet: {e}")
+    raise
 
 # Google Sheets setup
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -214,6 +218,19 @@ def set_event():
         venue=current_venue,
         message=message
     )
+
+@app.route('/debug-event-details')
+def debug_event_details():
+    try:
+        values = event_meta_sheet.row_values(2)
+        return {
+            "A2": values[0] if len(values) > 0 else None,
+            "B2": values[1] if len(values) > 1 else None,
+            "C2": values[2] if len(values) > 2 else None,
+            "D2": values[3] if len(values) > 3 else None,
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 
 
