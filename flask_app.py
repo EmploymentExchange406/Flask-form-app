@@ -34,10 +34,10 @@ def set_event_details(name, date, time, venue):
 
 # Google Sheets setup
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-#creds = ServiceAccountCredentials.from_json_keyfile_name("flaskformdataproject-38167ba1ba59.json", scope)
-creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
-creds_dict = json.loads(creds_json)
-creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name("flaskformdataproject-38167ba1ba59.json", scope)
+#creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
+#creds_dict = json.loads(creds_json)
+#creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 sheet = client.open("Placement_Form_Responses").sheet1
 event_meta_sheet = client.open("Placement_Form_Responses").worksheet("Event_Details")
@@ -74,13 +74,6 @@ def index():
         employment = request.form.get('employment', '')
         employmentCard = request.form.get('employmentCard', '')
         employmentCardNumber = request.form.get('employmentCardNumber','')
-        session_selected = request.form.get('session', 'Session 1')
-
-        if session_selected == "Session 1":
-         session_details = "22/09/2025 & 23/09/2025"
-        else:
-         session_details = "24/09/2025 & 25/09/2025"
-
 
         # VALIDATIONS
         if not (mobile.isdigit() and len(mobile) == 10):
@@ -97,7 +90,7 @@ def index():
         sheet.append_row([
             fullname, address, taluka, state, email, mobile,
             qualification, gender, category, experience,
-            employment, employmentCard, employmentCardNumber, timestamp, session_selected
+            employment, employmentCard, employmentCardNumber, timestamp
         ])
         all_data = sheet.get_all_records()
         last_entry = all_data[-1]
@@ -109,8 +102,7 @@ def index():
 
         # Read event details from Google Sheet (Event_Details worksheet)
         event_name = get_event_name()
-        ist = pytz.timezone('Asia/Kolkata')
-        event_date = datetime.now(ist).strftime("%Y-%m-%d")
+        event_date = get_event_date()
         event_time = get_event_time()
         event_venue = get_event_venue()
 
@@ -124,15 +116,10 @@ def index():
         📌 Registration Details:
         • Name: {fullname}
         • Registration ID: {registration_id}
-        • Date of Registration: {event_date}
+        • Event Date: {event_date}
         • Event Time: {event_time}
         • Venue: {event_venue}
-        
-        📌 Session Selected: {session_selected}
-        📌 Session Details: {session_details}
 
-        Please note: Lunch and refreshments will be provided to all participants.
-        
         Thank you for taking this step. We look forward to seeing you!
 
         Regards, 
