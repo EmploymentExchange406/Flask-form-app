@@ -43,10 +43,18 @@ sheet = client.open("Placement_Form_Responses").sheet1
 event_meta_sheet = client.open("Placement_Form_Responses").worksheet("Event_Details")
 
 
-def load_sheet_data():
-    data = sheet.get_all_records()
-    df = pd.DataFrame(data)
-    return df
+def get_event_details():
+ """Fetch only one row (A2:D2) instead of whole sheet"""
+ row = event_meta_sheet.row_values(2)
+ name = row[0] if len(row) > 0 else "Your Event"
+ date = row[1] if len(row) > 1 else "Event Date"
+ time = row[2] if len(row) > 2 else "Event Time"
+ venue = row[3] if len(row) > 3 else "Venue"
+ return name, date, time, venue
+
+
+def set_event_details(name, date, time, venue):
+ event_meta_sheet.update('A2:D2', [[name, date, time, venue]])
 
 # Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -92,21 +100,8 @@ def index():
             qualification, gender, category, experience,
             employment, employmentCard, employmentCardNumber, timestamp
         ])
-        last_row_num = len(sheet.get_all_values()) 
-        last_entry = sheet.row_values(last_row_num) 
-        
-        fullname = last_entry[0]   
-        email = last_entry[4]      
-        registration_id = last_row_num - 1 
-
-
-
-        # Read event details from Google Sheet (Event_Details worksheet)
-        event_name = get_event_name()
-        event_date = get_event_date()
-        event_time = get_event_time()
-        event_venue = get_event_venue()
-
+        registration_id = len(sheet.col_values(1)) - 1
+        event_name, event_date, event_time, event_venue = get_event_details()
         # Compose the email
         message_body = f"""Dear {fullname},
         
@@ -209,51 +204,49 @@ def set_event():
 
 @app.route('/generate-report', methods=['GET', 'POST'])
 def generate_report():
-    df = load_sheet_data()  # Replace with your actual Google Sheet loading function
-
-    # Clean and prepare data
-    df['DATE & TIME'] = pd.to_datetime(df['DATE & TIME'])
-    df['Date'] = df['DATE & TIME'].dt.date
-    df['Taluka'] = df['TALUKA'].str.strip()
-    df['Gender'] = df['GENDER'].str.lower()
-    df['Employment Status'] = df['EMPLOYMENT STATUS'].str.upper()
-    df['Category'] = df['CATEGORY'].str.upper()
-    df['Registered for Employment Card'] = df['REGISTERED FOR EMPLOYMENT CARD'].str.lower()
-
-    # Unique talukas for dropdown
-    talukas_raw = df['TALUKA'].dropna().unique()
-    talukas_cleaned = sorted([t.strip() for t in talukas_raw if t.strip() != ""])
-
-    report = None
-
-    if request.method == 'POST':
-        date = request.form['report_date']
-        taluka = request.form['report_taluka']
-
-        date_obj = datetime.strptime(date, "%Y-%m-%d").date()
-
-        # Filter data
-        df_filtered = df[df['Date'] == date_obj]
-        if taluka != 'All':
-             df_filtered = df_filtered[df_filtered['TALUKA'].str.strip().str.lower() == taluka.strip().lower()]
-
-        # Prepare counts
-        report = {
-            'date': date,
-            'taluka': taluka,
-            'total': len(df_filtered),
-            'employed': len(df_filtered[df_filtered['Employment Status'] == 'EMPLOYED']),
-            'unemployed': len(df_filtered[df_filtered['Employment Status'] == 'UNEMPLOYED']),
-            'male': len(df_filtered[df_filtered['Gender'] == 'male']),
-            'female': len(df_filtered[df_filtered['Gender'] == 'female']),
-            'transgender': len(df_filtered[df_filtered['Gender'] == 'transgender']),
-            'caste_counts': df_filtered['Category'].value_counts().to_dict(),
-            'emp_card_yes': len(df_filtered[df_filtered['Registered for Employment Card'] == 'yes']),
-            'emp_card_no': len(df_filtered[df_filtered['Registered for Employment Card'] == 'no']),
-        }
-
-    return render_template('generate_report.html', talukas=talukas_cleaned, report=report)
-# --- Logout Admin ---
+        # Fetch only necessary rows instead of get_all_records
+    all_values = sheet.get_all_values()
+    headers = all_values[0]
+    rows = all_values[1:]
+    
+    
+    total_registrations = len(rows)
+    
+    
+    # Index mapping for columns
+    gender_idx = headers.index("Gender")
+    category_idx = headers.index("Category")
+    employment_idx = headers.index("Employment Status")
+    empcard_idx = headers.index("Employment Card")
+    
+    
+    # Aggregate counts
+    gender_counts = {}
+    category_counts = {}
+    employment_counts = {}
+    empcard_counts = {}
+    
+    
+    for row in rows:
+     gender = row[gender_idx]
+    category = row[category_idx]
+    employment_status = row[employment_idx]
+    empcard_status = row[empcard_idx]
+    
+    
+    gender_counts[gender] = gender_counts.get(gender, 0) + 1
+    category_counts[category] = category_counts.get(category, 0) + 1
+    employment_counts[employment_status] = employment_counts.get(employment_status, 0) + 1
+    empcard_counts[empcard_status] = empcard_counts.get(empcard_status, 0) + 1
+    
+    
+    return render_template('admin_report.html',
+    total_registrations=total_registrations,
+    gender_counts=gender_counts,
+    category_counts=category_counts,
+    employment_counts=employment_counts,
+    empcard_counts=empcard_counts)
+    # --- Logout Admin ---
 @app.route('/logout',methods=['GET', 'POST'])
 def logout():
     session.pop('logged_in', None)
