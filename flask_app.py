@@ -92,12 +92,13 @@ def index():
             qualification, gender, category, experience,
             employment, employmentCard, employmentCardNumber, timestamp
         ])
-        all_data = sheet.get_all_records()
-        last_entry = all_data[-1]
+        last_row_num = len(sheet.get_all_values()) 
+        last_entry = sheet.row_values(last_row_num) 
         
-        fullname = last_entry["FULL NAME"]
-        email = last_entry["EMAIL ID"]
-        registration_id = len(all_data)  # Serial number
+        fullname = last_entry[0]   
+        email = last_entry[4]      
+        registration_id = last_row_num - 1 
+
 
 
         # Read event details from Google Sheet (Event_Details worksheet)
