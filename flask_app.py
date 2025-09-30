@@ -21,10 +21,10 @@ app.permanent_session_lifetime = timedelta(minutes=30)
 # Google Sheets Setup
 # -----------------------
 SCOPE_SHEETS = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("flaskformdataproject-38167ba1ba59.json", SCOPE_SHEETS)
-#creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
-#creds_dict = json.loads(creds_json)
-#creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, SCOPE_SHEETS)
+#creds = ServiceAccountCredentials.from_json_keyfile_name("flaskformdataproject-38167ba1ba59.json", SCOPE_SHEETS)
+creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
+creds_dict = json.loads(creds_json)
+creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, SCOPE_SHEETS)
 client = gspread.authorize(creds)
 sheet = client.open("Placement_Form_Responses").sheet1
 event_meta_sheet = client.open("Placement_Form_Responses").worksheet("Event_Details")
