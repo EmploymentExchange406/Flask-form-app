@@ -4,6 +4,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime, timedelta
 import pytz
 import os
+import smtplib
 from email.mime.text import MIMEText
 import base64
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -20,10 +21,10 @@ app.permanent_session_lifetime = timedelta(minutes=30)
 # Google Sheets Setup
 # -----------------------
 SCOPE_SHEETS = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-#creds = ServiceAccountCredentials.from_json_keyfile_name("flaskformdataproject-38167ba1ba59.json", SCOPE_SHEETS)
-creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
-creds_dict = json.loads(creds_json)
-creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, SCOPE_SHEETS)
+creds = ServiceAccountCredentials.from_json_keyfile_name("flaskformdataproject-38167ba1ba59.json", SCOPE_SHEETS)
+#creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
+#creds_dict = json.loads(creds_json)
+#creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, SCOPE_SHEETS)
 client = gspread.authorize(creds)
 sheet = client.open("Placement_Form_Responses").sheet1
 event_meta_sheet = client.open("Placement_Form_Responses").worksheet("Event_Details")
@@ -35,24 +36,15 @@ SCOPES_GMAIL = ["https://www.googleapis.com/auth/gmail.send"]
 CREDENTIALS_FILE = "credentials.json"  # OAuth client secrets
 TOKEN_FILE = "token.json"
 
-def get_gmail_service():
-    creds = None
-    if os.path.exists(TOKEN_FILE):
-        creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES_GMAIL)
-    if not creds or not creds.valid:
-        flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES_GMAIL)
-        creds = flow.run_local_server(port=0)
-        with open(TOKEN_FILE, "w") as token:
-            token.write(creds.to_json())
-    return build("gmail", "v1", credentials=creds)
-
 def send_email(to, subject, body):
-    service = get_gmail_service()
-    message = MIMEText(body)
-    message['to'] = to
-    message['subject'] = subject
-    raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
-    service.users().messages().send(userId='me', body={'raw': raw}).execute()
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = 'employmentexchange406@gmail.com'
+    msg['To'] = to
+
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+        server.login('employmentexchange406@gmail.com', 'wvdeodgvpyneqxrt')
+        server.send_message(msg)
 
 # -----------------------
 # Event Helpers
