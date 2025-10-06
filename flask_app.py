@@ -125,15 +125,15 @@ def index():
         """
         
         # Send the email
-        try:
-            msg = Message("Registration Confirmation",
-                          recipients=[email])
-            msg.body = message_body
-            mail.send(msg)
-        except Exception as e:
-            print("Email sending failed:", e)
-            
-        return redirect('/?success=true')
+     #   try:
+     #       msg = Message("Registration Confirmation",
+     #                     recipients=[email])
+     #       msg.body = message_body
+     #       mail.send(msg)
+     #   except Exception as e:
+     #       print("Email sending failed:", e)
+     #       
+     #   return redirect('/?success=true')
         
     success = request.args.get('success') == 'true'
     return render_template('form.html', success=success)
