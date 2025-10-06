@@ -60,6 +60,7 @@ def set_event_details(name, date, time, venue):
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = 'employmentexchange406@gmail.com'  
 app.config['MAIL_PASSWORD'] = 'bgcm kyrz jgdv vhma'     
 app.config['MAIL_DEFAULT_SENDER'] = 'employmentexchange406@gmail.com'
