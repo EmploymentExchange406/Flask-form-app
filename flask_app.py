@@ -133,7 +133,7 @@ def index():
      #   except Exception as e:
      #       print("Email sending failed:", e)
      #       
-     #   return redirect('/?success=true')
+        return redirect('/?success=true')
         
     success = request.args.get('success') == 'true'
     return render_template('form.html', success=success)
