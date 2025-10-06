@@ -61,7 +61,7 @@ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'employmentexchange406@gmail.com'  
-app.config['MAIL_PASSWORD'] = 'wvdeodgvpyneqxrt'     
+app.config['MAIL_PASSWORD'] = 'bgcm kyrz jgdv vhma'     
 app.config['MAIL_DEFAULT_SENDER'] = 'employmentexchange406@gmail.com'
 
 mail = Mail(app)
@@ -125,14 +125,14 @@ def index():
         """
         
         # Send the email
-     #   try:
-     #       msg = Message("Registration Confirmation",
-     #                     recipients=[email])
-     #       msg.body = message_body
-     #       mail.send(msg)
-     #   except Exception as e:
-     #       print("Email sending failed:", e)
-     #       
+        try:
+            msg = Message("Registration Confirmation",
+                          recipients=[email])
+            msg.body = message_body
+            mail.send(msg)
+        except Exception as e:
+            print("Email sending failed:", e)
+            
         return redirect('/?success=true')
         
     success = request.args.get('success') == 'true'
