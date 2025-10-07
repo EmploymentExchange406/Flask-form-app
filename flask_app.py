@@ -11,6 +11,9 @@ import pandas as pd
 from functools import wraps
 from flask import session
 from datetime import timedelta
+from fpdf import FPDF
+import io
+from flask import send_file
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_admin_key_0987654321'
@@ -56,18 +59,6 @@ def get_event_details():
 def set_event_details(name, date, time, venue):
  event_meta_sheet.update('A2:D2', [[name, date, time, venue]])
 
-# Flask-Mail configuration
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_TIMEOUT']  = 5
-app.config['MAIL_USERNAME'] = 'employmentexchange406@gmail.com'  
-app.config['MAIL_PASSWORD'] = 'wvdeodgvpyneqxrt'     
-app.config['MAIL_DEFAULT_SENDER'] = 'employmentexchange406@gmail.com'
-
-mail = Mail(app)
-
 @app.route("/", methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -102,44 +93,42 @@ def index():
             qualification, gender, category, experience,
             employment, employmentCard, employmentCardNumber, timestamp
         ])
+
+        # Use row number as registration ID
         registration_id = len(sheet.col_values(1)) - 1
+
+        # Event details
         event_name, event_date, event_time, event_venue = get_event_details()
-        # Compose the email
-        message_body = f"""Dear {fullname},
-        
-        Greetings from Office of the Commissioner, Labour & Employment, Regional Employment Exchange, Govt. of Goa.
-        
-        Congratulations! Your registration for {event_name} has been successfully completed.
-        
-        📌 Registration Details:
-        • Name: {fullname}
-        • Registration ID: {registration_id}
-        • Event Date: {event_date}
-        • Event Time: {event_time}
-        • Venue: {event_venue}
 
-        Thank you for taking this step. We look forward to seeing you!
+         # Create the PDF ticket
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=16)
+        pdf.cell(200, 10, txt="PLACEMENT DRIVE TICKET", ln=True, align='C')
+        pdf.ln(10)
+        pdf.set_font("Arial", size=12)
+        pdf.cell(200, 10, txt=f"Event: {event_name}", ln=True)
+        pdf.cell(200, 10, txt=f"Name: {fullname}", ln=True)
+        pdf.cell(200, 10, txt=f"Registration ID: {registration_id}", ln=True)
+        pdf.cell(200, 10, txt=f"Date: {event_date}", ln=True)
+        pdf.cell(200, 10, txt=f"Time: {event_time}", ln=True)
+        pdf.cell(200, 10, txt=f"Venue: {event_venue}", ln=True)
 
-        Regards, 
-        Regional Employment Exchange, 
-        Model Career Centre,
-        Panaji Goa 
-        """
-        
-        # Send the email
-        try:
-            msg = Message("Registration Confirmation",
-                          recipients=[email])
-            msg.body = message_body
-            mail.send(msg)
-        except Exception as e:
-            print("Email sending failed:", e)
-            
-        return redirect('/?success=true')
-        
-    success = request.args.get('success') == 'true'
-    return render_template('form.html', success=success)
+        # Create file stream
+        pdf_output = io.BytesIO()
+        pdf.output(pdf_output)
+        pdf_output.seek(0)
 
+        # Return the PDF for download
+        return send_file(
+            pdf_output,
+            as_attachment=True,
+            download_name=f"ticket_{registration_id}.pdf",
+            mimetype='application/pdf'
+        )
+
+    # Render form
+    return render_template('form.html')
   
      # --- Admin Login & Update Event 
 @app.route('/admin', methods=['GET', 'POST'])

@@ -149,7 +149,7 @@
 </div>
             <div class="form-title">Placement Drive / Session Registration Form</div>
         </div>
-        <form method="POST" action="/" autocomplete="off">
+        <form method="POST" action="{{ url_for('submit_form') }}" autocomplete="off">
             <label>FULL NAME</label>
             <input type="text" name="fullname" required>
 
@@ -242,27 +242,7 @@
                       );
                     }
                   </script>
-            <div id="successPopup" style="display: none;">
-                <div class="popup-content">
-                    <img src="{{ url_for('static', filename='Done.gif') }}" alt="Success" width="150">
-                    <p style="font-weight: bold; font-size: 24px;">Submission Successful !</p>
-                </div>
-             </div>
-        </form>
-<script>
-    window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('success') === 'true') {
-            document.getElementById('successPopup').style.display = 'flex';
-
-            // Optional: Hide after 3 seconds
-            setTimeout(() => {
-                document.getElementById('successPopup').style.display = 'none';
-            }, 3000);
-        }
-    }
-</script>
-
+                  
    <script>
 function toggleCardNumberField() {
     const select = document.getElementById("employmentCard");
