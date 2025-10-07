@@ -149,7 +149,7 @@
 </div>
             <div class="form-title">Placement Drive / Session Registration Form</div>
         </div>
-        <form method="POST" action="{{ url_for('submit_form') }}" autocomplete="off">
+        <form method="POST"  action="{{ url_for('index') }}" autocomplete="off">
             <label>FULL NAME</label>
             <input type="text" name="fullname" required>
 
@@ -242,7 +242,7 @@
                       );
                     }
                   </script>
-                  
+
    <script>
 function toggleCardNumberField() {
     const select = document.getElementById("employmentCard");
