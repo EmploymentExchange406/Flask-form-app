@@ -12,7 +12,7 @@ from functools import wraps
 from flask import session
 from datetime import timedelta
 from fpdf import FPDF
-import io
+from io import BytesIO
 from flask import send_file
 
 app = Flask(__name__)
@@ -114,18 +114,13 @@ def index():
         pdf.cell(200, 10, txt=f"Time: {event_time}", ln=True)
         pdf.cell(200, 10, txt=f"Venue: {event_venue}", ln=True)
 
-        # Create file stream
-        pdf_output = io.BytesIO()
-        pdf.output(pdf_output)
-        pdf_output.seek(0)
+        
+       # Generate PDF in memory
+        pdf_bytes = pdf.output(dest='S').encode('latin1')
+        pdf_output = BytesIO(pdf_bytes)
 
-        # Return the PDF for download
-        return send_file(
-            pdf_output,
-            as_attachment=True,
-            download_name=f"ticket_{registration_id}.pdf",
-            mimetype='application/pdf'
-        )
+       # Return the PDF for download
+        return send_file(pdf_output, as_attachment=True, download_name=f"ticket_{registration_id}.pdf", mimetype='application/pdf')
 
     # Render form
     return render_template('form.html')
