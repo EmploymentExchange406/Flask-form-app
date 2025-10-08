@@ -1,7 +1,6 @@
 from fileinput import filename
 import io
 from flask import Flask, render_template, request, redirect, url_for
-from flask_mail import Mail, Message
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
@@ -13,9 +12,8 @@ import pandas as pd
 from functools import wraps
 from flask import session
 from datetime import timedelta
-from fpdf import FPDF
-from io import BytesIO
-from flask import send_file,jsonify
+from flask import send_file,request,jsonify
+from PIL import Image, ImageDraw, ImageFont
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_admin_key_0987654321'
@@ -115,23 +113,35 @@ def download_ticket(reg_id):
     fullname = request.args.get("name", "Participant")
     event_name, event_date, event_time, event_venue = get_event_details()
 
-    # Generate PDF
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=16)
-    pdf.cell(200, 10, txt=f"Event: {event_name}", ln=True)
-    pdf.cell(200, 10, txt=f"Name: {fullname}", ln=True)
-    pdf.cell(200, 10, txt=f"Registration ID: {reg_id}", ln=True)
-    pdf.cell(200, 10, txt=f"Date: {event_date}", ln=True)
-    pdf.cell(200, 10, txt=f"Time: {event_time}", ln=True)
-    pdf.cell(200, 10, txt=f"Venue: {event_venue}", ln=True)
+    # 1️⃣ Open your custom image template
+    template_path = "templates/Entry_Pass_Template.png"  # Replace with your image file
+    image = Image.open(template_path).convert("RGB")  # Ensure it's in RGB mode for PDF
 
-    pdf_output = io.BytesIO()
-    pdf_output.write(pdf.output(dest="S").encode("latin1"))
-    pdf_output.seek(0)
+    # 2️⃣ Prepare to draw text
+    draw = ImageDraw.Draw(image)
+    # Choose a font and size (adjust path or use default)
+    try:
+        font = ImageFont.truetype("arialbd.ttf", size=28)
+    except:
+        font = ImageFont.load_default()
 
+    # 3️⃣ Draw the dynamic data on the image
+    # Adjust x, y coordinates to match your template
+    draw.text((353,351), event_name, fill="black", font=font)
+    draw.text((226,407), fullname, fill="black", font=font)
+    draw.text((353,463), str(reg_id), fill="black", font=font)
+    draw.text((353,522), event_date, fill="black", font=font)
+    draw.text((226,579), event_time, fill="black", font=font)
+    draw.text((226,635), event_venue, fill="black", font=font)
+
+    # 4️⃣ Save the image as PDF in memory
+    output_stream = io.BytesIO()
+    image.save(output_stream, format="PDF")
+    output_stream.seek(0)
+
+    # 5️⃣ Send the PDF to user
     return send_file(
-        pdf_output,
+        output_stream,
         as_attachment=True,
         download_name=f"ticket_{reg_id}.pdf",
         mimetype="application/pdf"
