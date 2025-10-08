@@ -242,44 +242,41 @@
                       );
                     }
                   </script>
-                  <script>
-                document.querySelector("form").addEventListener("submit", function (event) {
-                event.preventDefault(); // stop the default reload
-            
-                const form = event.target;
-                const formData = new FormData(form);
-            
-                // Submit form data to Flask
-                fetch("/", {
-                    method: "POST",
-                    body: formData
-                })
-                .then(response => response.blob()) // Flask returns PDF
-                .then(blob => {
-                    // 1️⃣ Show the success popup
-                    const popup = document.getElementById("successPopup");
-                    popup.style.display = "flex";
-            
-                    // 2️⃣ Trigger PDF download
-                    const link = document.createElement("a");
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = "ticket.pdf";
-                    link.click();
-            
-                    // 3️⃣ Reset the form immediately
-                    form.reset();
-            
-                    // 4️⃣ Hide the popup after 3 seconds
-                    setTimeout(() => {
-                        popup.style.display = "none";
-                    }, 3000);
-                })
-                .catch(error => {
-                    console.error("Error submitting form:", error);
-                    alert("Something went wrong. Please try again.");
-                });
-            });
-            </script>
+                  <div id="successPopup" style="display: none;">
+    <div class="popup-content">
+        <img src="{{ url_for('static', filename='Done.gif') }}" alt="Success" width="150">
+        <p style="font-weight: bold; font-size: 24px;">Submission Successful!</p>
+    </div>
+</div>
+
+<script>
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success') === 'true';
+    const reg_id = urlParams.get('reg_id');
+    const name = urlParams.get('name');
+
+    if (success && reg_id && name) {
+        // Show success popup
+        document.getElementById('successPopup').style.display = 'flex';
+
+        // Clear the form immediately
+        document.querySelector("form").reset();
+
+        // Trigger automatic download
+        const link = document.createElement('a');
+        link.href = `/download_ticket/${reg_id}?name=${encodeURIComponent(name)}`;
+        link.click();
+
+        // Hide popup and clear URL
+        setTimeout(() => {
+            document.getElementById('successPopup').style.display = 'none';
+            window.history.replaceState({}, document.title, "/");
+        }, 3000);
+    }
+};
+</script>
+
    <script>
 function toggleCardNumberField() {
     const select = document.getElementById("employmentCard");

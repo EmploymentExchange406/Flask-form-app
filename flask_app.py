@@ -1,3 +1,5 @@
+from fileinput import filename
+import io
 from flask import Flask, render_template, request, redirect, url_for
 from flask_mail import Mail, Message
 import gspread
@@ -13,7 +15,7 @@ from flask import session
 from datetime import timedelta
 from fpdf import FPDF
 from io import BytesIO
-from flask import send_file
+from flask import send_file,jsonify
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_admin_key_0987654321'
@@ -62,69 +64,78 @@ def set_event_details(name, date, time, venue):
 @app.route("/", methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        fullname = request.form.get('fullname', '')
-        address = request.form.get('address', '')
-        taluka = request.form.get('taluka', '')
-        state = request.form.get('state', '')
-        email = request.form.get('email', '')
-        mobile = request.form.get('mobile', '')
-        qualification = request.form.get('qualification', '')
-        gender = request.form.get('gender', '')
-        category = request.form.get('category', '')
-        experience = request.form.get('experience', '')
-        employment = request.form.get('employment', '')
-        employmentCard = request.form.get('employmentCard', '')
-        employmentCardNumber = request.form.get('employmentCardNumber','')
+            fullname = request.form.get('fullname', '')
+            address = request.form.get('address', '')
+            taluka = request.form.get('taluka', '')
+            state = request.form.get('state', '')
+            email = request.form.get('email', '')
+            mobile = request.form.get('mobile', '')
+            qualification = request.form.get('qualification', '')
+            gender = request.form.get('gender', '')
+            category = request.form.get('category', '')
+            experience = request.form.get('experience', '')
+            employment = request.form.get('employment', '')
+            employmentCard = request.form.get('employmentCard', '')
+            employmentCardNumber = request.form.get('employmentCardNumber','')
+    
+            # VALIDATIONS
+            if not (mobile.isdigit() and len(mobile) == 10):
+                return "Error: Mobile number must be exactly 10 digits."
+            try : experience = float(experience)
+            except ValueError:
+             return "Error: Experience must be a number."
+    
+            # Date and time
+            ist = pytz.timezone('Asia/Kolkata')
+            timestamp = datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S")
+             
+            # Add to Google Sheet
+            sheet.append_row([
+                fullname, address, taluka, state, email, mobile,
+                qualification, gender, category, experience,
+                employment, employmentCard, employmentCardNumber, timestamp
+            ])
+    
+            # Use row number as registration ID
+            registration_id = len(sheet.col_values(1)) - 1
 
-        # VALIDATIONS
-        if not (mobile.isdigit() and len(mobile) == 10):
-            return "Error: Mobile number must be exactly 10 digits."
-        try : experience = float(experience)
-        except ValueError:
-         return "Error: Experience must be a number."
+        # Redirect to self with success + registration info
+            return redirect(url_for("index", success="true", reg_id=registration_id, name=fullname))
 
-        # Date and time
-        ist = pytz.timezone('Asia/Kolkata')
-        timestamp = datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S")
-         
-        # Add to Google Sheet
-        sheet.append_row([
-            fullname, address, taluka, state, email, mobile,
-            qualification, gender, category, experience,
-            employment, employmentCard, employmentCardNumber, timestamp
-        ])
+    success = request.args.get("success") == "true"
+    reg_id = request.args.get("reg_id")
+    name = request.args.get("name")
+    return render_template("form.html", success=success, reg_id=reg_id, name=name)
+    
+ # Event details
+event_name, event_date, event_time, event_venue = get_event_details()
+    
+@app.route("/download_ticket/<int:reg_id>")
+def download_ticket(reg_id):
+    fullname = request.args.get("name", "Participant")
+    event_name, event_date, event_time, event_venue = get_event_details()
 
-        # Use row number as registration ID
-        registration_id = len(sheet.col_values(1)) - 1
+    # Generate PDF
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=16)
+    pdf.cell(200, 10, txt=f"Event: {event_name}", ln=True)
+    pdf.cell(200, 10, txt=f"Name: {fullname}", ln=True)
+    pdf.cell(200, 10, txt=f"Registration ID: {reg_id}", ln=True)
+    pdf.cell(200, 10, txt=f"Date: {event_date}", ln=True)
+    pdf.cell(200, 10, txt=f"Time: {event_time}", ln=True)
+    pdf.cell(200, 10, txt=f"Venue: {event_venue}", ln=True)
 
-        # Event details
-        event_name, event_date, event_time, event_venue = get_event_details()
+    pdf_output = io.BytesIO()
+    pdf_output.write(pdf.output(dest="S").encode("latin1"))
+    pdf_output.seek(0)
 
-         # Create the PDF ticket
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", size=16)
-        pdf.cell(200, 10, txt="PLACEMENT DRIVE TICKET", ln=True, align='C')
-        pdf.ln(10)
-        pdf.set_font("Arial", size=12)
-        pdf.cell(200, 10, txt=f"Event: {event_name}", ln=True)
-        pdf.cell(200, 10, txt=f"Name: {fullname}", ln=True)
-        pdf.cell(200, 10, txt=f"Registration ID: {registration_id}", ln=True)
-        pdf.cell(200, 10, txt=f"Date: {event_date}", ln=True)
-        pdf.cell(200, 10, txt=f"Time: {event_time}", ln=True)
-        pdf.cell(200, 10, txt=f"Venue: {event_venue}", ln=True)
-
-        
-       # Generate PDF in memory
-        pdf_bytes = pdf.output(dest='S').encode('latin1')
-        pdf_output = BytesIO(pdf_bytes)
-
-       # Return the PDF for download
-        return send_file(pdf_output, as_attachment=True, download_name=f"ticket_{registration_id}.pdf", mimetype='application/pdf')
-
-    # Render form
-    return render_template('form.html')
-  
+    return send_file(
+        pdf_output,
+        as_attachment=True,
+        download_name=f"ticket_{reg_id}.pdf",
+        mimetype="application/pdf"
+    )
      # --- Admin Login & Update Event 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
