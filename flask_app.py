@@ -121,7 +121,7 @@ def download_ticket(reg_id):
     draw = ImageDraw.Draw(image)
     # Choose a font and size (adjust path or use default)
     try:
-        font = ImageFont.truetype("arialbd.ttf", size=28)
+        font = ImageFont.truetype("font/arialbd.ttf", size=28)
     except:
         font = ImageFont.load_default()
 
