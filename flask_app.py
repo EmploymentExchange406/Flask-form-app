@@ -73,7 +73,6 @@ def index():
             category = request.form.get('category', '')
             experience = request.form.get('experience', '')
             employment = request.form.get('employment', '')
-            position = request.form.get('position','')
             employmentCard = request.form.get('employmentCard', '')
             employmentCardNumber = request.form.get('employmentCardNumber','')
     
@@ -92,7 +91,7 @@ def index():
             sheet.append_row([
                 fullname, address, taluka, state, email, mobile,
                 qualification, gender, category, experience,
-                employment, employmentCard, employmentCardNumber, timestamp,position
+                employment, employmentCard, employmentCardNumber, timestamp
             ])
     
             # Use row number as registration ID
