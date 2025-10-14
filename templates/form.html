@@ -150,8 +150,8 @@
             <div class="form-title">CAREER CONCLAVE 2025</div>
         </div>
         <form method="POST"  action="{{ url_for('index') }}" autocomplete="off">
-            <label>FULL NAME</label>
-            <input type="text" name="fullname" required>
+            <label>FULL NAME </label>
+            <input type="text" name="fullname" placeholder= "Name to appear on certificate" required>
 
             <label>GENDER</label>
             <select name="gender" required>
@@ -159,36 +159,6 @@
                 <option>Male</option>
                 <option>Female</option>
                 <option>Transgender</option>
-            </select>
-
-            <label>ADDRESS</label>
-            <input type="text" name="address" required>
-
-            <label>CATEGORY</label>
-            <select name="category" id="category" required oninvalid="this.setCustomValidity('Please select a category')" oninput="this.setCustomValidity('')">
-                <option value="">Select</option>
-                <option>General</option>
-                <option>OBC</option>
-                <option>SC</option>
-                <option>ST</option>
-            </select>
-
-            <label>TALUKA</label>
-            <select name="taluka" required>
-                <option value="">Select</option>
-                <option>Other</option>
-                <option>Bardez</option>
-                <option>Bicholim</option>
-                <option>Canacona</option>
-                <option>Dharbandora</option>
-                <option>Mormugoa</option>
-                <option>Pernem</option>
-                <option>Ponda</option>
-                <option>Quepem</option>
-                <option>Salcete</option>
-                <option>Sanguem</option>
-                <option>Sattari</option>
-                <option>Tiswadi</option>
             </select>
 
              <label>DATE OF BIRTH</label>
@@ -203,13 +173,12 @@
             <label>EMAIL ID</label>
             <input type="email" name="email"  autocomplete="off" required>
 
-            <label>NAME OF THE COLLEGE</label>
+            <label>NAME OF THE INSTITUITION</label>
             <input type="text" name="college" required>
 
             <div class="btn-row">
                 <button type="submit" class="submit-btn" style="width: 120px; height: 40px;">SUBMIT</button>
                 <button type="reset" class="clear-btn" style="width: 120px; height: 40px;">CLEAR</button>
-                <button type="button" class="admin-btn" style="width: 120px; height: 40px;" onclick="openAdminWindow()">ADMIN</button>
 
                   <!-- Script to handle window popup -->
                   <script>

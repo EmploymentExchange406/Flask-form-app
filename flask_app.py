@@ -63,12 +63,9 @@ def set_event_details(name, date, time, venue):
 def index():
     if request.method == 'POST':
             fullname = request.form.get('fullname', '')
-            address = request.form.get('address', '')
-            taluka = request.form.get('taluka', '')
             email = request.form.get('email', '')
             mobile = request.form.get('mobile', '')
             gender = request.form.get('gender', '')
-            category = request.form.get('category', '')
             birth = request.form.get('birth', '')
             college = request.form.get('college', '')
             # VALIDATIONS
@@ -80,8 +77,8 @@ def index():
              
             # Add to Google Sheet
             sheet.append_row([
-                fullname, address, taluka, email, mobile,
-                gender, category, birth, college, timestamp
+                fullname, email, mobile,
+                gender, birth, college, timestamp
             ])
     
             # Use row number as registration ID
