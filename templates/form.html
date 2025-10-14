@@ -147,7 +147,7 @@
           <div class="header">
   <img src="/static/Banner.png" alt="Goa Govt Logo">
 </div>
-            <div class="form-title">Placement Drive / Session Registration Form</div>
+            <div class="form-title">CAREER CONCLAVE 2025</div>
         </div>
         <form method="POST"  action="{{ url_for('index') }}" autocomplete="off">
             <label>FULL NAME</label>
@@ -191,8 +191,8 @@
                 <option>Tiswadi</option>
             </select>
 
-            <label>STATE</label>
-            <input type="text" name="state" required>
+             <label>DATE OF BIRTH</label>
+             <input type="date" name="birth" required>
 
             <label>MOBILE NO.</label>
             <input type="text" name="mobile" maxlength="10" 
@@ -200,31 +200,12 @@
             autocomplete="off" 
             oninvalid="this.setCustomValidity('Enter valid mobile number')"oninput="this.setCustomValidity('')"required>
 
-            <label>EXPERIENCE IN YEARS</label>
-            <input type="number" name="experience" step="0.1" required>
-
             <label>EMAIL ID</label>
             <input type="email" name="email"  autocomplete="off" required>
 
-            <label>EMPLOYMENT STATUS</label>
-            <select name="employment" required>
-                <option value="">Select</option>
-                <option>Employed</option>
-                <option>Unemployed</option>
-            </select>
+            <label>NAME OF THE COLLEGE</label>
+            <input type="text" name="college" required>
 
-            <label>HIGHEST QUALIFICATION</label>
-            <input type="text" name="qualification" required>
-
-            <label>REGISTERED FOR EMPLOYMENT CARD</label>
-             <select id="employmentCard" name="employmentCard" onchange="toggleCardNumberField()" required>
-                <option value="">Select</option>
-                <option>Yes</option>
-                <option>No</option>
-            </select>
-              <label id="employmentCardLabel" style="display: none;">EMPLOYMENT CARD NUMBER</label>
-              <input type="text" id="employmentCardNumber" pattern="LBR/LE/\d{4}/\d{3,}" placeholder="eg.LBR/LE/****/********" name="employmentCardNumber" style="display: none;">
-              </div>
             <div class="btn-row">
                 <button type="submit" class="submit-btn" style="width: 120px; height: 40px;">SUBMIT</button>
                 <button type="reset" class="clear-btn" style="width: 120px; height: 40px;">CLEAR</button>

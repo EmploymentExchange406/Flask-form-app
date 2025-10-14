@@ -37,12 +37,12 @@ def set_event_details(name, date, time, venue):
 
 # Google Sheets setup
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-#creds = ServiceAccountCredentials.from_json_keyfile_name("flaskformdataproject-38167ba1ba59.json", scope)
-creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
-creds_dict = json.loads(creds_json)
-creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name("flaskformdataproject-38167ba1ba59.json", scope)
+#creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
+#creds_dict = json.loads(creds_json)
+#creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
-sheet = client.open("Placement_Form_Responses").sheet1
+sheet = client.open("Placement_Form_Responses").worksheet("Career Conclave")
 event_meta_sheet = client.open("Placement_Form_Responses").worksheet("Event_Details")
 
 
@@ -65,33 +65,23 @@ def index():
             fullname = request.form.get('fullname', '')
             address = request.form.get('address', '')
             taluka = request.form.get('taluka', '')
-            state = request.form.get('state', '')
             email = request.form.get('email', '')
             mobile = request.form.get('mobile', '')
-            qualification = request.form.get('qualification', '')
             gender = request.form.get('gender', '')
             category = request.form.get('category', '')
-            experience = request.form.get('experience', '')
-            employment = request.form.get('employment', '')
-            employmentCard = request.form.get('employmentCard', '')
-            employmentCardNumber = request.form.get('employmentCardNumber','')
-    
+            birth = request.form.get('birth', '')
+            college = request.form.get('college', '')
             # VALIDATIONS
             if not (mobile.isdigit() and len(mobile) == 10):
                 return "Error: Mobile number must be exactly 10 digits."
-            try : experience = float(experience)
-            except ValueError:
-             return "Error: Experience must be a number."
-    
             # Date and time
             ist = pytz.timezone('Asia/Kolkata')
             timestamp = datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S")
              
             # Add to Google Sheet
             sheet.append_row([
-                fullname, address, taluka, state, email, mobile,
-                qualification, gender, category, experience,
-                employment, employmentCard, employmentCardNumber, timestamp
+                fullname, address, taluka, email, mobile,
+                gender, category, birth, college, timestamp
             ])
     
             # Use row number as registration ID
