@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Career Conclave 2025</title>
+    <title>Placement Drive Registration</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         @media (max-width: 768px) {
@@ -147,11 +147,11 @@
           <div class="header">
   <img src="/static/Banner.png" alt="Goa Govt Logo">
 </div>
-            <div class="form-title">CAREER CONCLAVE 2025</div>
+            <div class="form-title">Placement Drive / Session Registration Form</div>
         </div>
         <form method="POST"  action="{{ url_for('index') }}" autocomplete="off">
-            <label>FULL NAME </label>
-            <input type="text" name="fullname" placeholder= "Name to appear on certificate" required>
+            <label>FULL NAME</label>
+            <input type="text" name="fullname" required>
 
             <label>GENDER</label>
             <select name="gender" required>
@@ -161,8 +161,38 @@
                 <option>Transgender</option>
             </select>
 
-             <label>DATE OF BIRTH</label>
-             <input type="date" name="birth" required>
+            <label>ADDRESS</label>
+            <input type="text" name="address" required>
+
+            <label>CATEGORY</label>
+            <select name="category" id="category" required oninvalid="this.setCustomValidity('Please select a category')" oninput="this.setCustomValidity('')">
+                <option value="">Select</option>
+                <option>General</option>
+                <option>OBC</option>
+                <option>SC</option>
+                <option>ST</option>
+            </select>
+
+            <label>TALUKA</label>
+            <select name="taluka" required>
+                <option value="">Select</option>
+                <option>Other</option>
+                <option>Bardez</option>
+                <option>Bicholim</option>
+                <option>Canacona</option>
+                <option>Dharbandora</option>
+                <option>Mormugoa</option>
+                <option>Pernem</option>
+                <option>Ponda</option>
+                <option>Quepem</option>
+                <option>Salcete</option>
+                <option>Sanguem</option>
+                <option>Sattari</option>
+                <option>Tiswadi</option>
+            </select>
+
+            <label>STATE</label>
+            <input type="text" name="state" required>
 
             <label>MOBILE NO.</label>
             <input type="text" name="mobile" maxlength="10" 
@@ -170,15 +200,35 @@
             autocomplete="off" 
             oninvalid="this.setCustomValidity('Enter valid mobile number')"oninput="this.setCustomValidity('')"required>
 
+            <label>EXPERIENCE IN YEARS</label>
+            <input type="number" name="experience" step="0.1" required>
+
             <label>EMAIL ID</label>
             <input type="email" name="email"  autocomplete="off" required>
 
-            <label>NAME OF THE INSTITUITION</label>
-            <input type="text" name="college" required>
+            <label>EMPLOYMENT STATUS</label>
+            <select name="employment" required>
+                <option value="">Select</option>
+                <option>Employed</option>
+                <option>Unemployed</option>
+            </select>
 
+            <label>HIGHEST QUALIFICATION</label>
+            <input type="text" name="qualification" required>
+
+            <label>REGISTERED FOR EMPLOYMENT CARD</label>
+             <select id="employmentCard" name="employmentCard" onchange="toggleCardNumberField()" required>
+                <option value="">Select</option>1
+                <option>Yes</option>
+                <option>No</option>
+            </select>
+              <label id="employmentCardLabel" style="display: none;">EMPLOYMENT CARD NUMBER</label>
+              <input type="text" id="employmentCardNumber" pattern="LBR/LE/\d{4}/\d{3,}" placeholder="eg.LBR/LE/****/********" name="employmentCardNumber" style="display: none;">
+              </div>
             <div class="btn-row">
                 <button type="submit" class="submit-btn" style="width: 120px; height: 40px;">SUBMIT</button>
                 <button type="reset" class="clear-btn" style="width: 120px; height: 40px;">CLEAR</button>
+                <button type="button" class="admin-btn" style="width: 120px; height: 40px;" onclick="openAdminWindow()">ADMIN</button>
 
                   <!-- Script to handle window popup -->
                   <script>

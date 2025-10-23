@@ -42,7 +42,7 @@ creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
 creds_dict = json.loads(creds_json)
 creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
-sheet = client.open("Placement_Form_Responses").worksheet("Career Conclave")
+sheet = client.open("Placement_Form_Responses").sheet1
 event_meta_sheet = client.open("Placement_Form_Responses").worksheet("Event_Details")
 
 
@@ -63,22 +63,35 @@ def set_event_details(name, date, time, venue):
 def index():
     if request.method == 'POST':
             fullname = request.form.get('fullname', '')
+            address = request.form.get('address', '')
+            taluka = request.form.get('taluka', '')
+            state = request.form.get('state', '')
             email = request.form.get('email', '')
             mobile = request.form.get('mobile', '')
+            qualification = request.form.get('qualification', '')
             gender = request.form.get('gender', '')
-            birth = request.form.get('birth', '')
-            college = request.form.get('college', '')
+            category = request.form.get('category', '')
+            experience = request.form.get('experience', '')
+            employment = request.form.get('employment', '')
+            employmentCard = request.form.get('employmentCard', '')
+            employmentCardNumber = request.form.get('employmentCardNumber','')
+    
             # VALIDATIONS
             if not (mobile.isdigit() and len(mobile) == 10):
                 return "Error: Mobile number must be exactly 10 digits."
+            try : experience = float(experience)
+            except ValueError:
+             return "Error: Experience must be a number."
+    
             # Date and time
             ist = pytz.timezone('Asia/Kolkata')
             timestamp = datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S")
              
             # Add to Google Sheet
             sheet.append_row([
-                fullname, email, mobile,
-                gender, birth, college, timestamp
+                fullname, address, taluka, state, email, mobile,
+                qualification, gender, category, experience,
+                employment, employmentCard, employmentCardNumber, timestamp
             ])
     
             # Use row number as registration ID
@@ -94,149 +107,45 @@ def index():
     
  # Event details
 event_name, event_date, event_time, event_venue = get_event_details()
-
-from flask import request, send_file
-from PIL import Image, ImageDraw, ImageFont
-import io
-import os # We'll use os.path.exists for a safer font check
-
-# --- CONFIGURATION CONSTANTS (Adjust these based on your 'Certificate.png') ---
-# 1. Coordinates for the name's *center* point.
-# Based on the image, the name "Aditya Babu Shetye" is roughly centered horizontally.
-NAME_CENTER_X = 1080  # This seems to be your target X coordinate
-NAME_Y_POSITION = 680 # This is your current Y coordinate
-
-# 2. Maximum allowed width for the name in pixels.
-# Estimate the available space. For a centered name, this is roughly 2x the distance
-# from the center point to the edge of the text area. Let's estimate 1200 pixels max.
-MAX_NAME_WIDTH = 1400
-
-# 3. Font sizing limits
-MAX_FONT_SIZE = 130  # Your current starting size
-MIN_FONT_SIZE = 60   # Don't go smaller than this
-
-# 4. Font path
-FONT_PATH = "font/CORALIE.ttf"
-
-# --------------------------------------------------------------------------------
-
-def get_fitting_font_size(draw, name, font_path, max_width):
-    """
-    Iteratively finds the largest font size that makes the 'name' fit within 'max_width'.
     
-    Args:
-        draw (ImageDraw.Draw): The drawing context for text measurement.
-        name (str): The text string to measure.
-        font_path (str): The path to the TrueType font file.
-        max_width (int): The maximum allowable width in pixels.
-
-    Returns:
-        ImageFont: The PIL font object with the largest fitting size.
-    """
-    current_size = MAX_FONT_SIZE
-    
-    # Safely load the font, falling back to default if path is invalid
-    if not os.path.exists(font_path):
-        return ImageFont.load_default()
-
-    while current_size >= MIN_FONT_SIZE:
-        try:
-            # 1. Load the font at the current size
-            font = ImageFont.truetype(font_path, size=current_size)
-        except Exception:
-            # Fallback if font file is corrupt, etc.
-            return ImageFont.load_default() 
-        
-        # 2. Measure the text length
-        # textlength is the most reliable measurement for width
-        text_width = draw.textlength(name, font=font)
-        
-        # 3. Check if it fits
-        if text_width <= max_width:
-            return font  # Found the perfect fit!
-
-        # 4. If it doesn't fit, try a smaller size
-        current_size -= 5 # Decrease by a step (e.g., 5 points) for efficiency
-        
-    # If the loop finishes and it still doesn't fit (i.e., we hit MIN_FONT_SIZE)
-    # return the font at the minimum size.
-    return ImageFont.truetype(font_path, size=MIN_FONT_SIZE)
-
-
 @app.route("/download_ticket/<int:reg_id>")
 def download_ticket(reg_id):
     fullname = request.args.get("name", "Participant")
+    event_name, event_date, event_time, event_venue = get_event_details()
 
     # 1️⃣ Open your custom image template
-    template_path = "templates/Certificate.png"
-    image = Image.open(template_path).convert("RGB")
+    template_path = "templates/Entry_Pass_Template.png"  # Replace with your image file
+    image = Image.open(template_path).convert("RGB")  # Ensure it's in RGB mode for PDF
+
+    # 2️⃣ Prepare to draw text
     draw = ImageDraw.Draw(image)
+    # Choose a font and size (adjust path or use default)
+    try:
+        font = ImageFont.truetype("font/arialbd.ttf", size=28)
+    except:
+        font = ImageFont.load_default()
 
-    # 2️⃣ DYNAMIC FONT SIZE ADJUSTMENT
-    # Determine the font and its size that best fits the name
-    fitting_font = get_fitting_font_size(draw, fullname, FONT_PATH, MAX_NAME_WIDTH)
-    
-    # 3️⃣ Calculate the new X position for CENTERING
-    # Use the fitting font to measure the final width
-    final_text_width = draw.textlength(fullname, font=fitting_font)
-    
-    # Calculate the starting X coordinate for centering:
-    # X_start = X_Center - (Text_Width / 2)
-    x_start_position = NAME_CENTER_X - (final_text_width / 2)
+    # 3️⃣ Draw the dynamic data on the image
+    # Adjust x, y coordinates to match your template
+    draw.text((353,351), event_name, fill="black", font=font)
+    draw.text((226,407), fullname, fill="black", font=font)
+    draw.text((353,463), str(reg_id), fill="black", font=font)
+    draw.text((353,522), event_date, fill="black", font=font)
+    draw.text((226,579), event_time, fill="black", font=font)
+    draw.text((226,635), event_venue, fill="black", font=font)
 
-    # 4️⃣ Draw the dynamic data on the image
-    draw.text(
-        (x_start_position, NAME_Y_POSITION),  # Use the calculated X for centering
-        fullname, 
-        fill="black", 
-        font=fitting_font                        # Use the calculated font object
-    )
-
-    # 5️⃣ Save the image as PDF in memory
+    # 4️⃣ Save the image as PDF in memory
     output_stream = io.BytesIO()
     image.save(output_stream, format="PDF")
     output_stream.seek(0)
 
-    # 6️⃣ Send the PDF to user
+    # 5️⃣ Send the PDF to user
     return send_file(
         output_stream,
         as_attachment=True,
         download_name=f"ticket_{reg_id}.pdf",
         mimetype="application/pdf"
     )
-    
-#@app.route("/download_ticket/<int:reg_id>")
-#def download_ticket(reg_id):
-#    fullname = request.args.get("name", "Participant")
-#
-#    # 1️⃣ Open your custom image template
-#    template_path = "templates/Certificate.png"  # Replace with your image file
-#    image = Image.open(template_path).convert("RGB")  # Ensure it's in RGB mode for PDF
-#
-#    # 2️⃣ Prepare to draw text
-#    draw = ImageDraw.Draw(image)
-#    # Choose a font and size (adjust path or use default)
-#    try:
-#        font = ImageFont.truetype("font/CORALIE.ttf", size=130)
-#    except:
-#        font = ImageFont.load_default()
-#
-#    # 3️⃣ Draw the dynamic data on the image
-#    # Adjust x, y coordinates to match your template
-#    draw.text((1080,680), fullname, fill="black", font=font)
-#
-#    # 4️⃣ Save the image as PDF in memory
-#    output_stream = io.BytesIO()
-#    image.save(output_stream, format="PDF")
-#    output_stream.seek(0)
-#
-#    # 5️⃣ Send the PDF to user
-#    return send_file(
-#        output_stream,
-#        as_attachment=True,
-#        download_name=f"ticket_{reg_id}.pdf",
-#        mimetype="application/pdf"
-#    )
      # --- Admin Login & Update Event 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
