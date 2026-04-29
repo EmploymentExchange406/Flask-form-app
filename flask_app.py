@@ -92,7 +92,7 @@ def index():
                 fullname, address, taluka, state, email, mobile,
                 qualification, gender, category, experience,
                 employment, employmentCard, employmentCardNumber, timestamp
-            ])
+            ], table_range="A1:O1")
     
             # Use row number as registration ID
             registration_id = len(sheet.col_values(1)) - 1
