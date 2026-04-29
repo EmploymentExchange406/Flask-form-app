@@ -37,10 +37,10 @@ def set_event_details(name, date, time, venue):
 
 # Google Sheets setup
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-#creds = ServiceAccountCredentials.from_json_keyfile_name("flaskformdataproject-38167ba1ba59.json", scope)
-creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
-creds_dict = json.loads(creds_json)
-creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name("flaskformdataproject-38167ba1ba59.json", scope)
+#creds_json = base64.b64decode(os.environ["GOOGLE_CREDS"]).decode("utf-8")
+#creds_dict = json.loads(creds_json)
+#creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 sheet = client.open("Placement_Form_Responses").sheet1
 event_meta_sheet = client.open("Placement_Form_Responses").worksheet("Event_Details")
@@ -92,7 +92,7 @@ def index():
                 fullname, address, taluka, state, email, mobile,
                 qualification, gender, category, experience,
                 employment, employmentCard, employmentCardNumber, timestamp
-            ])
+            ], table_range="A1:N1")
     
             # Use row number as registration ID
             registration_id = len(sheet.col_values(1)) - 1
@@ -211,48 +211,53 @@ def set_event():
 
 @app.route('/generate-report', methods=['GET', 'POST'])
 def generate_report():
-        # Fetch only necessary rows instead of get_all_records
     all_values = sheet.get_all_values()
+    if not all_values:
+        return "❌ No data found in sheet."
+
     headers = all_values[0]
     rows = all_values[1:]
-    
-    
     total_registrations = len(rows)
-    
-    
-    # Index mapping for columns
-    gender_idx = headers.index("Gender")
-    category_idx = headers.index("Category")
-    employment_idx = headers.index("Employment Status")
-    empcard_idx = headers.index("Employment Card")
-    
-    
-    # Aggregate counts
+
+    # Convert headers to lowercase for flexible matching
+    headers_lower = [h.lower().strip() for h in headers]
+
+    try:
+        gender_idx = headers_lower.index("gender")
+        category_idx = headers_lower.index("category")
+        employment_idx = headers_lower.index("employment status")
+        empcard_idx = headers_lower.index("registered for employment card")
+    except ValueError as e:
+        return f"❌ Missing column: {e}"
+
     gender_counts = {}
     category_counts = {}
     employment_counts = {}
     empcard_counts = {}
-    
-    
+
     for row in rows:
-     gender = row[gender_idx]
-    category = row[category_idx]
-    employment_status = row[employment_idx]
-    empcard_status = row[empcard_idx]
-    
-    
-    gender_counts[gender] = gender_counts.get(gender, 0) + 1
-    category_counts[category] = category_counts.get(category, 0) + 1
-    employment_counts[employment_status] = employment_counts.get(employment_status, 0) + 1
-    empcard_counts[empcard_status] = empcard_counts.get(empcard_status, 0) + 1
-    
-    
-    return render_template('admin_report.html',
-    total_registrations=total_registrations,
-    gender_counts=gender_counts,
-    category_counts=category_counts,
-    employment_counts=employment_counts,
-    empcard_counts=empcard_counts)
+        if len(row) <= max(gender_idx, category_idx, employment_idx, empcard_idx):
+            continue
+
+        gender = row[gender_idx]
+        category = row[category_idx]
+        employment_status = row[employment_idx]
+        empcard_status = row[empcard_idx]
+
+        gender_counts[gender] = gender_counts.get(gender, 0) + 1
+        category_counts[category] = category_counts.get(category, 0) + 1
+        employment_counts[employment_status] = employment_counts.get(employment_status, 0) + 1
+        empcard_counts[empcard_status] = empcard_counts.get(empcard_status, 0) + 1
+
+    return render_template(
+        'generate_report.html',
+        total_registrations=total_registrations,
+        gender_counts=gender_counts,
+        category_counts=category_counts,
+        employment_counts=employment_counts,
+        empcard_counts=empcard_counts
+    )
+
     # --- Logout Admin ---
 @app.route('/logout',methods=['GET', 'POST'])
 def logout():
