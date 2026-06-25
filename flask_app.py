@@ -114,7 +114,7 @@ def download_ticket(reg_id):
     event_name, event_date, event_time, event_venue = get_event_details()
 
     # 1️⃣ Open your custom image template
-    template_path = "templates/Entry_Pass_Template.png"  # Replace with your image file
+    template_path = "templates/Pass.png"  # Replace with your image file
     image = Image.open(template_path).convert("RGB")  # Ensure it's in RGB mode for PDF
 
     # 2️⃣ Prepare to draw text
