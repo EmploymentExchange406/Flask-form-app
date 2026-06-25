@@ -121,18 +121,18 @@ def download_ticket(reg_id):
     draw = ImageDraw.Draw(image)
     # Choose a font and size (adjust path or use default)
     try:
-        font = ImageFont.truetype("font/arialbd.ttf", size=28)
+        font = ImageFont.truetype("font/arialbd.ttf", size=30)
     except:
         font = ImageFont.load_default()
 
     # 3️⃣ Draw the dynamic data on the image
     # Adjust x, y coordinates to match your template
-    draw.text((353,351), event_name, fill="black", font=font)
-    draw.text((226,407), fullname, fill="black", font=font)
-    draw.text((353,463), str(reg_id), fill="black", font=font)
-    draw.text((353,522), event_date, fill="black", font=font)
-    draw.text((226,579), event_time, fill="black", font=font)
-    draw.text((226,635), event_venue, fill="black", font=font)
+    draw.text((522,909), event_name, fill="black", font=font)
+    draw.text((522,768), fullname, fill="black", font=font)
+    draw.text((725,640), str(reg_id), fill="black", font=font)
+    draw.text((522,514), event_date, fill="black", font=font)
+    draw.text((522,395), event_time, fill="black", font=font)
+    draw.text((522,262), event_venue, fill="black", font=font)
 
     # 4️⃣ Save the image as PDF in memory
     output_stream = io.BytesIO()
