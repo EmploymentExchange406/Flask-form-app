@@ -121,30 +121,30 @@ def download_ticket(reg_id):
     draw = ImageDraw.Draw(image)
     # Choose a font and size (adjust path or use default)
     try:
-        font = ImageFont.truetype("font/arialbd.ttf", size=30)
+        font = ImageFont.truetype("font/arialbd.ttf", size=40)
     except:
         font = ImageFont.load_default()
 
     # 3️⃣ Draw the dynamic data on the image
     # Adjust x, y coordinates to match your template
-    draw.text((522,909), event_name, fill="black", font=font)
-    draw.text((522,768), fullname, fill="black", font=font)
-    draw.text((725,640), str(reg_id), fill="black", font=font)
-    draw.text((522,514), event_date, fill="black", font=font)
-    draw.text((522,395), event_time, fill="black", font=font)
-    draw.text((522,262), event_venue, fill="black", font=font)
+    draw.text((520,652), event_name, fill="black", font=font)
+    draw.text((520,794), fullname, fill="black", font=font)
+    draw.text((725,923), str(reg_id), fill="black", font=font)
+    draw.text((520,1050), event_date, fill="black", font=font)
+    draw.text((520,1165), event_time, fill="black", font=font)
+    draw.text((520,1300), event_venue, fill="black", font=font)
 
     # 4️⃣ Save the image as PDF in memory
     output_stream = io.BytesIO()
-    image.save(output_stream, format="PDF")
+    image.save(output_stream, format="PNG")
     output_stream.seek(0)
 
     # 5️⃣ Send the PDF to user
     return send_file(
         output_stream,
         as_attachment=True,
-        download_name=f"ticket_{reg_id}.pdf",
-        mimetype="application/pdf"
+        download_name=f"ticket_{reg_id}.PNG",
+        mimetype="application/png"
     )
      # --- Admin Login & Update Event 
 @app.route('/admin', methods=['GET', 'POST'])
