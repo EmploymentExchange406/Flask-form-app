@@ -16,9 +16,9 @@ from flask import send_file,request,jsonify
 from PIL import Image, ImageDraw, ImageFont
 
 app = Flask(__name__)
-@app.before_request
-def maintenance_mode():
-    return render_template("closed.html")
+#@app.before_request
+#def maintenance_mode():
+#    return render_template("closed.html")
 app.secret_key = 'super_secret_admin_key_0987654321'
 app.permanent_session_lifetime = timedelta(minutes=30)
 
